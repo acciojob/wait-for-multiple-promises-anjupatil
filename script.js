@@ -1,38 +1,52 @@
-//your JS code here. If required.
+const res = document.getElementById("output");
+
 const promises = [
-  new Promise(resolve => setTimeout(() => resolve('Promise 1'), Math.floor(Math.random() * 3000) + 1000)),
-  new Promise(resolve => setTimeout(() => resolve('Promise 2'), Math.floor(Math.random() * 3000) + 1000)),
-  new Promise(resolve => setTimeout(() => resolve('Promise 3'), Math.floor(Math.random() * 3000) + 1000))
+  new Promise((resolve) => {
+    const time = Math.floor(Math.random() * 3 + 1) * 1000;
+    setTimeout(() => resolve({ name: "Promise 1", time: time / 1000 }), time);
+  }),
+  new Promise((resolve) => {
+    const time = Math.floor(Math.random() * 3 + 1) * 1000;
+    setTimeout(() => resolve({ name: "Promise 2", time: time / 1000 }), time);
+  }),
+  new Promise((resolve) => {
+    const time = Math.floor(Math.random() * 3 + 1) * 1000;
+    setTimeout(() => resolve({ name: "Promise 3", time: time / 1000 }), time);
+  }),
 ];
 
-// Add loading text to table
-const table = document.getElementById('output');
-const loadingRow = table.insertRow();
-const loadingCell = loadingRow.insertCell();
-loadingCell.colSpan = 2;
-loadingCell.textContent = 'Loading...';
-
-Promise.all(promises)
-  .then(results => {
-    // Remove loading text
-    table.deleteRow(0);
-
-    // Add rows for each Promise result
-    results.forEach((result, index) => {
-      const row = table.insertRow();
-      const nameCell = row.insertCell();
-      const timeCell = row.insertCell();
-
-      nameCell.textContent = result;
-      timeCell.textContent = ((Date.now() - startTime) / 1000).toFixed(3);
+async function callFnc() {
+  const start = new Date();
+  // Use Promise.all to wait for all Promises to resolve
+  res.innerHTML += `
+            <tr id="loading">
+                <td colspan=2>Loading...</td>
+            </tr>
+          `;
+  await Promise.all(promises)
+    .then((results) => {
+      res.innerHTML = ``;
+      // Log the array of results
+      results.forEach((e) => {
+        res.innerHTML += `
+            <tr>
+                <td>${e.name}</td>
+                <td>${e.time}</td>
+            </tr>
+          `;
+      });
+    })
+    .catch((error) => {
+      console.error(error);
     });
 
-    // Add total row
-    const totalRow = table.insertRow();
-    const totalNameCell = totalRow.insertCell();
-    const totalTimeCell = totalRow.insertCell();
-
-    totalNameCell.textContent = 'Total';
-    totalTimeCell.textContent = ((Date.now() - startTime) / 1000).toFixed(3);
-  })
-  .catch(error => console.log(error));
+  const end = new Date();
+  const timeInMillis = end - start;
+  res.innerHTML += `
+            <tr>
+                <td>Total</td>
+                <td>${timeInMillis / 1000}</td>
+            </tr>
+          `;
+}
+callFnc();
